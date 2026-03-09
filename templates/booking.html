@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% block title %}Book — TravelGo{% endblock %} {%
+block content %}
+<section class="section booking-section">
+  <div class="booking-wrapper">
+    <!-- Item summary -->
+    <div class="card booking-summary-card">
+      <h3>
+        {% set type_icons = {'flights': 'flight', 'hotels': 'hotel', 'trains':
+        'train', 'buses': 'directions_bus'} %}
+        <span class="material-icons"
+          >{{ type_icons.get(item_type, 'trip_origin') }}</span
+        >
+        {{ item.get('name', item.get('airline', item.get('operator', 'N/A'))) }}
+      </h3>
+      <div class="summary-details">
+        {% if item_type != 'hotels' %}
+        <p>
+          <span class="material-icons">place</span> {{ item.get('source', '') }}
+          &rarr; {{ item.get('destination', '') }}
+        </p>
+        {% else %}
+        <p>
+          <span class="material-icons">place</span> {{ item.get('destination',
+          '') }}
+        </p>
+        {% endif %} {% if item.get('date') %}
+        <p><span class="material-icons">event</span> {{ item.date }}</p>
+        {% endif %} {% if item.get('departure') %}
+        <p>
+          <span class="material-icons">schedule</span> Dep: {{ item.departure }}
+        </p>
+        {% endif %} {% if item.get('arrival') %}
+        <p>
+          <span class="material-icons">schedule</span> Arr: {{ item.arrival }}
+        </p>
+        {% endif %} {% if item.get('duration') %}
+        <p><span class="material-icons">timelapse</span> {{ item.duration }}</p>
+        {% endif %}
+        <p>
+          <span class="material-icons">event_seat</span> {{
+          item.get('availability', 0) }} {{ 'seats' if item_type != 'hotels'
+          else 'rooms' }} left
+        </p>
+        <p class="price-tag">
+          ₹{{ "%.2f"|format(item.price) }} <small>per person/room</small>
+        </p>
+      </div>
+    </div>
+
+    <!-- Booking form -->
+    <div class="card booking-form-card">
+      <h3>Complete Your Booking</h3>
+      <form
+        method="POST"
+        action="{{ url_for('booking.book', item_type=item_type, item_id=item._id) }}"
+      >
+        <div class="form-group">
+          <label for="date">Travel Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            required
+            value="{{ item.get('date', '') }}"
+          />
+        </div>
+        <div class="form-group">
+          <label for="passengers"
+            >{{ 'Rooms' if item_type == 'hotels' else 'Passengers' }}</label
+          >
+          <input
+            type="number"
+            id="passengers"
+            name="passengers"
+            min="1"
+            max="{{ item.get('availability', 1) }}"
+            value="1"
+            required
+          />
+        </div>
+        {% if item_type != 'hotels' %}
+        <div class="form-group">
+          <label for="seat_preference">Seat Preference</label>
+          <select id="seat_preference" name="seat_preference">
+            <option value="any">No Preference</option>
+            <option value="window">Window</option>
+            <option value="aisle">Aisle</option>
+            <option value="middle">Middle</option>
+          </select>
+        </div>
+        {% endif %}
+
+        <div class="booking-total" id="bookingTotal">
+          <strong
+            >Total: ₹<span id="totalPrice"
+              >{{ "%.2f"|format(item.price) }}</span
+            ></strong
+          >
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg">
+          <span class="material-icons">check_circle</span> Confirm Booking
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script>
+  // Live total price calculation
+  const pricePerUnit = {{ item.price }};
+  const passInput = document.getElementById('passengers');
+  const totalEl = document.getElementById('totalPrice');
+  passInput.addEventListener('input', () => {
+      const qty = parseInt(passInput.value) || 1;
+      totalEl.textContent = (pricePerUnit * qty).toFixed(2);
+  });
+</script>
+{% endblock %}

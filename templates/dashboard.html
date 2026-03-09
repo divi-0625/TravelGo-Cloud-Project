@@ -1,0 +1,155 @@
+{% extends "base.html" %} {% block title %}Dashboard — TravelGo{% endblock %} {%
+block content %}
+<section class="section dashboard-section">
+  <h2 class="section-title">
+    <span class="material-icons">dashboard</span> My Dashboard
+  </h2>
+
+  <div class="dashboard-grid">
+    <!-- Stats row -->
+    <div class="dash-stats">
+      <div class="card stat-card">
+        <span class="material-icons">confirmation_number</span>
+        <div>
+          <h4>{{ bookings|length }}</h4>
+          <p>Total Bookings</p>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <span class="material-icons">check_circle</span>
+        <div>
+          <h4>
+            {{ bookings|selectattr('status', 'equalto', 'confirmed')|list|length
+            }}
+          </h4>
+          <p>Active</p>
+        </div>
+      </div>
+      <div class="card stat-card">
+        <span class="material-icons">notifications</span>
+        <div>
+          <h4>{{ unread_count }}</h4>
+          <p>Unread Alerts</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    {% if notifications %}
+    <div class="card dash-notifications">
+      <h3>
+        <span class="material-icons">notifications_active</span> Recent
+        Notifications
+      </h3>
+      <ul class="notif-list">
+        {% for n in notifications %}
+        <li class="notif-item {% if not n.read %}unread{% endif %}">
+          <span class="material-icons notif-type-icon">
+            {% if n.type == 'success' %}check_circle {% elif n.type ==
+            'reminder' %}alarm {% elif n.type == 'warning' %}warning {% else
+            %}info{% endif %}
+          </span>
+          <div class="notif-body">
+            <p>{{ n.message }}</p>
+            <small>{{ n.created_at.strftime('%b %d, %Y %H:%M') }}</small>
+          </div>
+          {% if not n.read %}
+          <form
+            method="POST"
+            action="{{ url_for('notifications.mark_read', notif_id=n._id) }}"
+          >
+            <button class="btn btn-sm btn-outline" title="Mark as read">
+              <span class="material-icons">done</span>
+            </button>
+          </form>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Bookings list -->
+    <div class="card dash-bookings">
+      <h3><span class="material-icons">list_alt</span> My Bookings</h3>
+      {% if bookings %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Route / Location</th>
+              <th>Date</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+            <tr>
+              <td>
+                {% set icons = {'flights': 'flight', 'hotels': 'hotel',
+                'trains': 'train', 'buses': 'directions_bus'} %}
+                <span class="material-icons"
+                  >{{ icons.get(b.item_type, 'trip_origin') }}</span
+                >
+              </td>
+              <td>{{ b.get('item_name', 'N/A') }}</td>
+              <td>
+                {% if b.get('source') %}{{ b.source }} &rarr; {% endif %}{{
+                b.get('destination', '') }}
+              </td>
+              <td>{{ b.date }}</td>
+              <td>{{ b.passengers }}</td>
+              <td>₹{{ "%.2f"|format(b.price) }}</td>
+              <td>
+                <span
+                  class="badge {% if b.status == 'confirmed' %}badge-success{% else %}badge-muted{% endif %}"
+                >
+                  {{ b.status|title }}
+                </span>
+              </td>
+              <td>
+                <div class="action-btns">
+                  <a
+                    href="{{ url_for('booking.download', booking_id=b._id) }}"
+                    class="btn btn-sm btn-outline"
+                    title="Download PDF"
+                  >
+                    <span class="material-icons" style="font-size: 16px"
+                      >picture_as_pdf</span
+                    >
+                  </a>
+                  {% if b.status == 'confirmed' %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('booking.cancel', booking_id=b._id) }}"
+                    onsubmit="return confirm('Cancel this booking?');"
+                    style="display: inline"
+                  >
+                    <button class="btn btn-sm btn-danger">Cancel</button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state small">
+        <span class="material-icons">flight_takeoff</span>
+        <p>
+          No bookings yet.
+          <a href="{{ url_for('search.search_page') }}">Start searching!</a>
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,358 @@
+{% extends "base.html" %} {% block title %}Admin — TravelGo{% endblock %} {%
+block content %}
+<section class="section admin-section">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar card">
+      <h3><span class="material-icons">admin_panel_settings</span> Admin</h3>
+      <ul class="admin-nav">
+        <li>
+          <a
+            href="{{ url_for('admin.dashboard') }}"
+            class="{% if section == 'dashboard' %}active{% endif %}"
+          >
+            <span class="material-icons">bar_chart</span> Dashboard</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{ url_for('admin.users') }}"
+            class="{% if section == 'users' %}active{% endif %}"
+          >
+            <span class="material-icons">people</span> Users</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{ url_for('admin.bookings') }}"
+            class="{% if section == 'bookings' %}active{% endif %}"
+          >
+            <span class="material-icons">receipt_long</span> Bookings</a
+          >
+        </li>
+        <li class="nav-divider"></li>
+        <li>
+          <a
+            href="{{ url_for('admin.list_items', transport_type='flights') }}"
+            class="{% if transport_type is defined and transport_type == 'flights' %}active{% endif %}"
+          >
+            <span class="material-icons">flight</span> Flights</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{ url_for('admin.list_items', transport_type='hotels') }}"
+            class="{% if transport_type is defined and transport_type == 'hotels' %}active{% endif %}"
+          >
+            <span class="material-icons">hotel</span> Hotels</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{ url_for('admin.list_items', transport_type='trains') }}"
+            class="{% if transport_type is defined and transport_type == 'trains' %}active{% endif %}"
+          >
+            <span class="material-icons">train</span> Trains</a
+          >
+        </li>
+        <li>
+          <a
+            href="{{ url_for('admin.list_items', transport_type='buses') }}"
+            class="{% if transport_type is defined and transport_type == 'buses' %}active{% endif %}"
+          >
+            <span class="material-icons">directions_bus</span> Buses</a
+          >
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main content area -->
+    <div class="admin-main">
+      <!-- ====== DASHBOARD ====== -->
+      {% if section == 'dashboard' %}
+      <h2>Dashboard Statistics</h2>
+      <div class="admin-stats-grid">
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">people</span>
+          <div>
+            <h4>{{ stats.users }}</h4>
+            <p>Users</p>
+          </div>
+        </div>
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">receipt_long</span>
+          <div>
+            <h4>{{ stats.bookings }}</h4>
+            <p>Bookings</p>
+          </div>
+        </div>
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">flight</span>
+          <div>
+            <h4>{{ stats.flights }}</h4>
+            <p>Flights</p>
+          </div>
+        </div>
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">hotel</span>
+          <div>
+            <h4>{{ stats.hotels }}</h4>
+            <p>Hotels</p>
+          </div>
+        </div>
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">train</span>
+          <div>
+            <h4>{{ stats.trains }}</h4>
+            <p>Trains</p>
+          </div>
+        </div>
+        <div class="card stat-card admin-stat">
+          <span class="material-icons">directions_bus</span>
+          <div>
+            <h4>{{ stats.buses }}</h4>
+            <p>Buses</p>
+          </div>
+        </div>
+      </div>
+
+      {% if stats.bookings_by_type %}
+      <div class="card" style="margin-top: 1.5rem; padding: 1.5rem">
+        <h3>Bookings by Type</h3>
+        <div class="booking-type-bars">
+          {% for btype, cnt in stats.bookings_by_type.items() %} {% set pct =
+          (cnt / stats.bookings * 100)|int if stats.bookings else 0 %}
+          <div class="bar-row">
+            <span class="bar-label">{{ btype|title }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" style="width: {{ pct }}%"></div>
+            </div>
+            <span class="bar-value">{{ cnt }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- ====== USERS ====== -->
+      {% elif section == 'users' %}
+      <h2>All Users</h2>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span
+                  class="badge {% if u.role == 'admin' %}badge-admin{% else %}badge-success{% endif %}"
+                  >{{ u.role }}</span
+                >
+              </td>
+              <td>{{ u.created_at.strftime('%Y-%m-%d') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ====== BOOKINGS ====== -->
+      {% elif section == 'bookings' %}
+      <h2>All Bookings</h2>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Type</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bookings %}
+            <tr>
+              <td>{{ b.get('username', 'N/A') }}</td>
+              <td>{{ b.item_type|title }}</td>
+              <td>{{ b.get('item_name', 'N/A') }}</td>
+              <td>{{ b.date }}</td>
+              <td>₹{{ "%.2f"|format(b.price) }}</td>
+              <td>
+                <span
+                  class="badge {% if b.status == 'confirmed' %}badge-success{% else %}badge-muted{% endif %}"
+                  >{{ b.status|title }}</span
+                >
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ====== LIST ITEMS ====== -->
+      {% elif section == 'list' %}
+      <div class="admin-list-header">
+        <h2>{{ transport_type|title }}</h2>
+        <a
+          href="{{ url_for('admin.add_item', transport_type=transport_type) }}"
+          class="btn btn-primary btn-sm"
+        >
+          <span class="material-icons">add</span> Add New
+        </a>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              {% for f in fields %}
+              <th>{{ f|title }}</th>
+              {% endfor %}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              {% for f in fields %}
+              <td>{{ item.get(f, '') }}</td>
+              {% endfor %}
+              <td class="action-cell">
+                <a
+                  href="{{ url_for('admin.edit_item', transport_type=transport_type, item_id=item._id) }}"
+                  class="btn btn-sm btn-outline"
+                  title="Edit"
+                >
+                  <span class="material-icons">edit</span>
+                </a>
+                <form
+                  method="POST"
+                  style="display: inline"
+                  action="{{ url_for('admin.delete_item', transport_type=transport_type, item_id=item._id) }}"
+                  onsubmit="return confirm('Delete this item?');"
+                >
+                  <button class="btn btn-sm btn-danger" title="Delete">
+                    <span class="material-icons">delete</span>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ====== ADD ITEM ====== -->
+      {% elif section == 'add' %}
+      <h2>Add {{ transport_type|title }}</h2>
+      <div class="card" style="padding: 1.5rem">
+        <form
+          method="POST"
+          action="{{ url_for('admin.add_item', transport_type=transport_type) }}"
+        >
+          <div class="form-grid">
+            {% for f in fields %}
+            <div class="form-group">
+              <label>{{ f|title }}</label>
+              {% if f == 'price' %}
+              <input type="number" step="0.01" name="{{ f }}" required />
+              {% elif f in ('availability', 'rooms') %}
+              <input type="number" name="{{ f }}" required />
+              {% elif f == 'rating' %}
+              <input type="number" step="0.1" min="0" max="5" name="{{ f }}" />
+              {% elif f in ('date', 'checkin', 'checkout') %}
+              <input type="date" name="{{ f }}" />
+              {% else %}
+              <input type="text" name="{{ f }}" required />
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="margin-top: 1rem"
+          >
+            <span class="material-icons">save</span> Save
+          </button>
+          <a
+            href="{{ url_for('admin.list_items', transport_type=transport_type) }}"
+            class="btn btn-outline"
+            style="margin-top: 1rem"
+            >Cancel</a
+          >
+        </form>
+      </div>
+
+      <!-- ====== EDIT ITEM ====== -->
+      {% elif section == 'edit' %}
+      <h2>Edit {{ transport_type|title }}</h2>
+      <div class="card" style="padding: 1.5rem">
+        <form
+          method="POST"
+          action="{{ url_for('admin.edit_item', transport_type=transport_type, item_id=item._id) }}"
+        >
+          <div class="form-grid">
+            {% for f in fields %}
+            <div class="form-group">
+              <label>{{ f|title }}</label>
+              {% if f == 'price' %}
+              <input
+                type="number"
+                step="0.01"
+                name="{{ f }}"
+                value="{{ item.get(f, '') }}"
+              />
+              {% elif f in ('availability', 'rooms') %}
+              <input
+                type="number"
+                name="{{ f }}"
+                value="{{ item.get(f, '') }}"
+              />
+              {% elif f == 'rating' %}
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="5"
+                name="{{ f }}"
+                value="{{ item.get(f, '') }}"
+              />
+              {% elif f in ('date', 'checkin', 'checkout') %}
+              <input type="date" name="{{ f }}" value="{{ item.get(f, '') }}" />
+              {% else %}
+              <input type="text" name="{{ f }}" value="{{ item.get(f, '') }}" />
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            style="margin-top: 1rem"
+          >
+            <span class="material-icons">save</span> Update
+          </button>
+          <a
+            href="{{ url_for('admin.list_items', transport_type=transport_type) }}"
+            class="btn btn-outline"
+            style="margin-top: 1rem"
+            >Cancel</a
+          >
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

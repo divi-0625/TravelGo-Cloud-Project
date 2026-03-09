@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% block title %}Booking Confirmed — TravelGo{%
+endblock %} {% block content %}
+<section class="section confirmation-section">
+  <div class="card confirmation-card">
+    <div class="confirm-icon-wrap">
+      <span class="material-icons confirm-icon">check_circle</span>
+    </div>
+    <h2>Booking Confirmed!</h2>
+    <p class="confirm-id">Booking ID: <strong>{{ booking._id }}</strong></p>
+
+    <div class="confirm-details">
+      <div class="confirm-row">
+        <span>Type</span><span>{{ booking.item_type|title }}</span>
+      </div>
+      <div class="confirm-row">
+        <span>Name</span><span>{{ booking.get('item_name', 'N/A') }}</span>
+      </div>
+      {% if booking.get('source') %}
+      <div class="confirm-row">
+        <span>Route</span
+        ><span>{{ booking.source }} &rarr; {{ booking.destination }}</span>
+      </div>
+      {% endif %}
+      <div class="confirm-row">
+        <span>Date</span><span>{{ booking.date }}</span>
+      </div>
+      <div class="confirm-row">
+        <span>Passengers/Rooms</span><span>{{ booking.passengers }}</span>
+      </div>
+      {% if booking.get('seat_preference') and booking.seat_preference != 'any'
+      %}
+      <div class="confirm-row">
+        <span>Seat Pref</span><span>{{ booking.seat_preference|title }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Payment Details -->
+      {% if booking.get('payment') %}
+      <div class="confirm-row">
+        <span>Payment Method</span>
+        <span>
+          {% if booking.payment.method == 'card' %}
+          <span
+            class="material-icons"
+            style="font-size: 16px; vertical-align: middle"
+            >credit_card</span
+          >
+          Card ending ****{{ booking.payment.card_last4 }} {% elif
+          booking.payment.method == 'upi' %}
+          <span
+            class="material-icons"
+            style="font-size: 16px; vertical-align: middle"
+            >account_balance_wallet</span
+          >
+          UPI ({{ booking.payment.upi_id }}) {% elif booking.payment.method ==
+          'netbanking' %}
+          <span
+            class="material-icons"
+            style="font-size: 16px; vertical-align: middle"
+            >account_balance</span
+          >
+          Net Banking ({{ booking.payment.get('bank', 'N/A') }}) {% endif %}
+        </span>
+      </div>
+      <div class="confirm-row">
+        <span>Payment Status</span>
+        <span class="badge badge-success">
+          <span
+            class="material-icons"
+            style="font-size: 14px; vertical-align: middle"
+            >check</span
+          >
+          {{ booking.payment.status|title }}
+        </span>
+      </div>
+      {% endif %}
+
+      <div class="confirm-row total-row">
+        <span>Total Paid</span><span>₹{{ "%.2f"|format(booking.price) }}</span>
+      </div>
+      <div class="confirm-row">
+        <span>Status</span
+        ><span class="badge badge-success">{{ booking.status|title }}</span>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <a
+        href="{{ url_for('booking.download', booking_id=booking._id) }}"
+        class="btn btn-primary"
+      >
+        <span
+          class="material-icons"
+          style="font-size: 18px; vertical-align: middle"
+          >picture_as_pdf</span
+        >
+        Download PDF
+      </a>
+      <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline"
+        >Go to Dashboard</a
+      >
+      <a href="{{ url_for('search.search_page') }}" class="btn btn-outline"
+        >Book Another</a
+      >
+    </div>
+  </div>
+</section>
+{% endblock %}

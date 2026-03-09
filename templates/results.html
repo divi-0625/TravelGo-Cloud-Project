@@ -1,0 +1,135 @@
+{% extends "base.html" %} {% block title %}Results — TravelGo{% endblock %} {%
+block content %} {% set type_icons = {'flights': 'flight', 'hotels': 'hotel',
+'trains': 'train', 'buses': 'directions_bus'} %}
+<section class="section results-section">
+  <div class="results-header">
+    <h2 class="section-title">
+      <span class="material-icons"
+        >{{ type_icons.get(search_type, 'search') }}</span
+      >
+      {{ search_type|title }} Results
+    </h2>
+    <p class="results-meta">
+      {% if source %}{{ source }} &rarr; {% endif %}{{ destination }} {% if date
+      %} &bull; {{ date }}{% endif %} &bull; {{ items|length }} result{{ 's' if
+      items|length != 1 }}
+    </p>
+  </div>
+
+  {% if date_relaxed == 'nearby' %}
+  <div class="alert alert-info-soft">
+    <span class="material-icons">date_range</span>
+    <strong>Showing nearby dates.</strong> No exact match for {{ date }}, but
+    here are options within a few days of your selected date.
+  </div>
+  {% elif date_relaxed %}
+  <div class="alert alert-price-drop">
+    <span class="material-icons">info</span>
+    <strong>No results near your date.</strong> Showing all available dates for
+    this route instead.
+  </div>
+  {% endif %} {% if price_alerts %}
+  <div class="alert alert-price-drop">
+    <span class="material-icons">local_offer</span>
+    <strong>Price Drop Alert!</strong> {{ price_alerts|length }} option(s) under
+    ₹1,000 — grab them now!
+  </div>
+  {% endif %}
+
+  <div class="sort-bar">
+    <span>Sort:</span>
+    <a
+      href="{{ url_for('search.results', type=search_type, source=source, destination=destination, date=date, sort='price') }}"
+      class="btn btn-sm {% if sort_by == 'price' %}btn-primary{% else %}btn-outline{% endif %}"
+      >Price</a
+    >
+    {% if search_type != 'hotels' %}
+    <a
+      href="{{ url_for('search.results', type=search_type, source=source, destination=destination, date=date, sort='duration') }}"
+      class="btn btn-sm {% if sort_by == 'duration' %}btn-primary{% else %}btn-outline{% endif %}"
+      >Duration</a
+    >
+    {% else %}
+    <a
+      href="{{ url_for('search.results', type=search_type, source=source, destination=destination, date=date, sort='rating') }}"
+      class="btn btn-sm {% if sort_by == 'rating' %}btn-primary{% else %}btn-outline{% endif %}"
+      >Rating</a
+    >
+    {% endif %}
+  </div>
+
+  {% if items %}
+  <div class="card-grid results-grid">
+    {% for item in items %}
+    <div class="card result-card">
+      <div class="result-card-header">
+        <span class="material-icons result-type-icon"
+          >{{ type_icons.get(search_type, 'trip_origin') }}</span
+        >
+        <h3>
+          {{ item.get('name', item.get('airline', item.get('operator', 'N/A')))
+          }}
+        </h3>
+        {% if search_type == 'hotels' and item.get('rating') %}
+        <span class="badge badge-rating">&#9733; {{ item.rating }}</span>
+        {% endif %}
+      </div>
+
+      <div class="result-card-body">
+        {% if search_type != 'hotels' %}
+        <p>
+          <strong>Route:</strong> {{ item.get('source', '') }} &rarr; {{
+          item.get('destination', '') }}
+        </p>
+        {% else %}
+        <p><strong>Location:</strong> {{ item.get('destination', '') }}</p>
+        {% endif %} {% if item.get('date') %}
+        <p><strong>Date:</strong> {{ item.date }}</p>
+        {% endif %} {% if item.get('checkin') %}
+        <p><strong>Check-in:</strong> {{ item.checkin }}</p>
+        {% endif %} {% if item.get('checkout') %}
+        <p><strong>Check-out:</strong> {{ item.checkout }}</p>
+        {% endif %} {% if item.get('departure') %}
+        <p><strong>Departure:</strong> {{ item.departure }}</p>
+        {% endif %} {% if item.get('arrival') %}
+        <p><strong>Arrival:</strong> {{ item.arrival }}</p>
+        {% endif %} {% if item.get('duration') %}
+        <p><strong>Duration:</strong> {{ item.duration }}</p>
+        {% endif %} {% if item.get('amenities') %}
+        <p><strong>Amenities:</strong> {{ item.amenities }}</p>
+        {% endif %}
+        <p>
+          <strong>Available:</strong> {{ item.get('availability', 0) }} {{
+          'seats' if search_type != 'hotels' else 'rooms' }}
+        </p>
+      </div>
+
+      <div class="result-card-footer">
+        <span class="price">₹{{ "%.2f"|format(item.price) }}</span>
+        {% if session.get('user_id') %}
+        <a
+          href="{{ url_for('booking.book', item_type=search_type, item_id=item._id) }}"
+          class="btn btn-primary btn-sm"
+          >Book Now</a
+        >
+        {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+          >Login to Book</a
+        >
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <span class="material-icons">search_off</span>
+    <h3>No results found</h3>
+    <p>Try changing your search criteria or removing the date filter.</p>
+    <a href="{{ url_for('search.search_page') }}" class="btn btn-primary"
+      >New Search</a
+    >
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

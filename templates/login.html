@@ -1,0 +1,41 @@
+{% extends "base.html" %} {% block title %}Login — TravelGo{% endblock %} {%
+block content %}
+<section class="auth-section">
+  <div class="auth-card card">
+    <div class="auth-header">
+      <span class="material-icons auth-icon">login</span>
+      <h2>Welcome Back</h2>
+      <p>Log in to access your bookings</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+    </form>
+
+    <p class="auth-footer">
+      Don't have an account?
+      <a href="{{ url_for('auth.register') }}">Register</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% block title %}Profile — TravelGo{% endblock %} {%
+block content %}
+<section class="section profile-section">
+  <h2 class="section-title">
+    <span class="material-icons">person</span> My Profile
+  </h2>
+
+  <div class="profile-grid">
+    <!-- Profile info card -->
+    <div class="card profile-card">
+      <div class="profile-avatar">
+        <span class="material-icons">account_circle</span>
+      </div>
+      <h3>{{ user.username }}</h3>
+      <p class="text-muted">{{ user.email }}</p>
+      <p class="text-muted">
+        Member since {{ user.created_at.strftime('%b %Y') }}
+      </p>
+
+      <form
+        method="POST"
+        action="{{ url_for('main.profile') }}"
+        class="profile-form"
+      >
+        <input type="hidden" name="action" value="update_profile" />
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            name="username"
+            value="{{ user.username }}"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input
+            type="tel"
+            name="phone"
+            value="{{ user.get('phone', '') }}"
+            placeholder="+1 555 000 0000"
+          />
+        </div>
+        <div class="form-group">
+          <label>Address</label>
+          <input
+            type="text"
+            name="address"
+            value="{{ user.get('address', '') }}"
+            placeholder="City, State"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          Save Changes
+        </button>
+      </form>
+    </div>
+
+    <!-- Change password card -->
+    <div class="card password-card">
+      <h3><span class="material-icons">lock</span> Change Password</h3>
+      <form method="POST" action="{{ url_for('main.profile') }}">
+        <input type="hidden" name="action" value="change_password" />
+        <div class="form-group">
+          <label>Current Password</label>
+          <input type="password" name="current_password" required />
+        </div>
+        <div class="form-group">
+          <label>New Password</label>
+          <input type="password" name="new_password" required minlength="6" />
+        </div>
+        <div class="form-group">
+          <label>Confirm New Password</label>
+          <input type="password" name="confirm_password" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          Update Password
+        </button>
+      </form>
+    </div>
+
+    <!-- Booking history -->
+    <div class="card history-card">
+      <h3><span class="material-icons">history</span> Booking History</h3>
+      {% if bookings %}
+      <ul class="history-list">
+        {% for b in bookings[:10] %}
+        <li class="history-item">
+          {% set icons = {'flights': 'flight', 'hotels': 'hotel', 'trains':
+          'train', 'buses': 'directions_bus'} %}
+          <span class="material-icons"
+            >{{ icons.get(b.item_type, 'trip_origin') }}</span
+          >
+          <div>
+            <strong>{{ b.get('item_name', 'N/A') }}</strong>
+            <span
+              class="badge {% if b.status == 'confirmed' %}badge-success{% else %}badge-muted{% endif %}"
+            >
+              {{ b.status|title }}
+            </span>
+            <br />
+            <small>{{ b.date }} &bull; ₹{{ "%.2f"|format(b.price) }}</small>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-muted">No bookings yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

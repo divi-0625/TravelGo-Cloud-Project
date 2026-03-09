@@ -1,0 +1,621 @@
+{% extends "base.html" %} {% block title %}Search — TravelGo{% endblock %} {%
+block content %}
+<section class="section search-section">
+  <h2 class="section-title">Search Travel Options</h2>
+
+  <!-- Tabs -->
+  <div class="tabs" id="searchTabs">
+    <button
+      class="tab {% if active_tab == 'flights' %}active{% endif %}"
+      data-tab="flights"
+    >
+      <span class="material-icons">flight</span> Flights
+    </button>
+    <button
+      class="tab {% if active_tab == 'hotels' %}active{% endif %}"
+      data-tab="hotels"
+    >
+      <span class="material-icons">hotel</span> Hotels
+    </button>
+    <button
+      class="tab {% if active_tab == 'trains' %}active{% endif %}"
+      data-tab="trains"
+    >
+      <span class="material-icons">train</span> Trains
+    </button>
+    <button
+      class="tab {% if active_tab == 'buses' %}active{% endif %}"
+      data-tab="buses"
+    >
+      <span class="material-icons">directions_bus</span> Buses
+    </button>
+  </div>
+
+  <!-- Flights -->
+  <form
+    class="tab-panel {% if active_tab == 'flights' %}active{% endif %}"
+    id="panel-flights"
+    action="{{ url_for('search.results') }}"
+    method="get"
+  >
+    <input type="hidden" name="type" value="flights" />
+    <div class="search-grid">
+      <div class="form-group autocomplete-wrapper">
+        <label>From</label>
+        <input
+          type="text"
+          name="source"
+          placeholder="City or airport"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="flights"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group autocomplete-wrapper">
+        <label>To</label>
+        <input
+          type="text"
+          name="destination"
+          placeholder="City or airport"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="flights"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" />
+      </div>
+      <div class="form-group">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" placeholder="Any" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Sort By</label>
+        <select name="sort">
+          <option value="price">Lowest Price</option>
+          <option value="duration">Shortest Duration</option>
+        </select>
+      </div>
+      <div class="form-group btn-group">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-icons">search</span> Search
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Hotels -->
+  <form
+    class="tab-panel {% if active_tab == 'hotels' %}active{% endif %}"
+    id="panel-hotels"
+    action="{{ url_for('search.results') }}"
+    method="get"
+  >
+    <input type="hidden" name="type" value="hotels" />
+    <div class="search-grid">
+      <div class="form-group autocomplete-wrapper">
+        <label>Destination</label>
+        <input
+          type="text"
+          name="destination"
+          placeholder="City"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="hotels"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group">
+        <label>Check-in</label>
+        <input type="date" name="date" />
+      </div>
+      <div class="form-group">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" placeholder="Any" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Min Rating</label>
+        <select name="min_rating">
+          <option value="">Any</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+          <option value="4.5">4.5+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sort By</label>
+        <select name="sort">
+          <option value="price">Lowest Price</option>
+          <option value="rating">Highest Rating</option>
+        </select>
+      </div>
+      <div class="form-group btn-group">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-icons">search</span> Search
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Trains -->
+  <form
+    class="tab-panel {% if active_tab == 'trains' %}active{% endif %}"
+    id="panel-trains"
+    action="{{ url_for('search.results') }}"
+    method="get"
+  >
+    <input type="hidden" name="type" value="trains" />
+    <div class="search-grid">
+      <div class="form-group autocomplete-wrapper">
+        <label>From</label>
+        <input
+          type="text"
+          name="source"
+          placeholder="Station"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="trains"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group autocomplete-wrapper">
+        <label>To</label>
+        <input
+          type="text"
+          name="destination"
+          placeholder="Station"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="trains"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" />
+      </div>
+      <div class="form-group">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" placeholder="Any" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Sort By</label>
+        <select name="sort">
+          <option value="price">Lowest Price</option>
+          <option value="duration">Shortest Duration</option>
+        </select>
+      </div>
+      <div class="form-group btn-group">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-icons">search</span> Search
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Buses -->
+  <form
+    class="tab-panel {% if active_tab == 'buses' %}active{% endif %}"
+    id="panel-buses"
+    action="{{ url_for('search.results') }}"
+    method="get"
+  >
+    <input type="hidden" name="type" value="buses" />
+    <div class="search-grid">
+      <div class="form-group autocomplete-wrapper">
+        <label>From</label>
+        <input
+          type="text"
+          name="source"
+          placeholder="City"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="buses"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group autocomplete-wrapper">
+        <label>To</label>
+        <input
+          type="text"
+          name="destination"
+          placeholder="City"
+          required
+          autocomplete="off"
+          class="ac-input"
+          data-mode="buses"
+        />
+        <ul class="suggestions-dropdown ac-dropdown"></ul>
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" />
+      </div>
+      <div class="form-group">
+        <label>Max Price (₹)</label>
+        <input type="number" name="max_price" placeholder="Any" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Sort By</label>
+        <select name="sort">
+          <option value="price">Lowest Price</option>
+          <option value="duration">Shortest Duration</option>
+        </select>
+      </div>
+      <div class="form-group btn-group">
+        <button type="submit" class="btn btn-primary">
+          <span class="material-icons">search</span> Search
+        </button>
+      </div>
+    </div>
+  </form>
+</section>
+
+<!-- ==================== AVAILABLE LISTINGS ==================== -->
+<section class="section available-listings">
+  <h2 class="section-title">Available Options</h2>
+
+  <!-- Listing Tabs (synced with search tabs) -->
+  <div class="tabs listing-tabs" id="listingTabs">
+    <button
+      class="tab {% if active_tab == 'flights' %}active{% endif %}"
+      data-listing="flights"
+    >
+      <span class="material-icons">flight</span> Flights ({{
+      listings.flights|length }})
+    </button>
+    <button
+      class="tab {% if active_tab == 'trains' %}active{% endif %}"
+      data-listing="trains"
+    >
+      <span class="material-icons">train</span> Trains ({{
+      listings.trains|length }})
+    </button>
+    <button
+      class="tab {% if active_tab == 'buses' %}active{% endif %}"
+      data-listing="buses"
+    >
+      <span class="material-icons">directions_bus</span> Buses ({{
+      listings.buses|length }})
+    </button>
+    <button
+      class="tab {% if active_tab == 'hotels' %}active{% endif %}"
+      data-listing="hotels"
+    >
+      <span class="material-icons">hotel</span> Hotels ({{
+      listings.hotels|length }})
+    </button>
+  </div>
+
+  <!-- Flights listing -->
+  <div
+    class="listing-panel {% if active_tab == 'flights' %}active{% endif %}"
+    id="listing-flights"
+  >
+    <div class="card-grid listing-grid">
+      {% for item in listings.flights %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">flight</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='flights', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Trains listing -->
+  <div
+    class="listing-panel {% if active_tab == 'trains' %}active{% endif %}"
+    id="listing-trains"
+  >
+    <div class="card-grid listing-grid">
+      {% for item in listings.trains %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">train</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='trains', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Buses listing -->
+  <div
+    class="listing-panel {% if active_tab == 'buses' %}active{% endif %}"
+    id="listing-buses"
+  >
+    <div class="card-grid listing-grid">
+      {% for item in listings.buses %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">directions_bus</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='buses', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Hotels listing -->
+  <div
+    class="listing-panel {% if active_tab == 'hotels' %}active{% endif %}"
+    id="listing-hotels"
+  >
+    <div class="card-grid listing-grid">
+      {% for item in listings.hotels %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">hotel</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p><strong>{{ item.destination }}</strong></p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.checkin }} &rarr; {{ item.checkout }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >star</span
+            >
+            {{ item.rating }} / 5
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >meeting_room</span
+            >
+            {{ item.availability }} rooms available
+          </p>
+          <p class="amenities-text">
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >wifi</span
+            >
+            {{ item.amenities }}
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='hotels', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+<script>
+  document.querySelectorAll("#searchTabs .tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll("#searchTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".tab-panel")
+        .forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document
+        .getElementById("panel-" + btn.dataset.tab)
+        .classList.add("active");
+
+      // Sync listing tabs
+      document
+        .querySelectorAll("#listingTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".listing-panel")
+        .forEach((p) => p.classList.remove("active"));
+      const matchingListingTab = document.querySelector(
+        '#listingTabs .tab[data-listing="' + btn.dataset.tab + '"]',
+      );
+      if (matchingListingTab) matchingListingTab.classList.add("active");
+      const matchingPanel = document.getElementById(
+        "listing-" + btn.dataset.tab,
+      );
+      if (matchingPanel) matchingPanel.classList.add("active");
+    });
+  });
+
+  // Listing tab switching (also syncs search tabs)
+  document.querySelectorAll("#listingTabs .tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll("#listingTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".listing-panel")
+        .forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document
+        .getElementById("listing-" + btn.dataset.listing)
+        .classList.add("active");
+
+      // Sync search tabs
+      document
+        .querySelectorAll("#searchTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".tab-panel")
+        .forEach((p) => p.classList.remove("active"));
+      const matchingSearchTab = document.querySelector(
+        '#searchTabs .tab[data-tab="' + btn.dataset.listing + '"]',
+      );
+      if (matchingSearchTab) matchingSearchTab.classList.add("active");
+      const matchingPanel = document.getElementById(
+        "panel-" + btn.dataset.listing,
+      );
+      if (matchingPanel) matchingPanel.classList.add("active");
+    });
+  });
+
+  // Init autocomplete on all ac-input fields
+  document.querySelectorAll(".ac-input").forEach((input) => {
+    const dropdown = input.parentElement.querySelector(".ac-dropdown");
+    if (dropdown) initAutocomplete(input, dropdown);
+  });
+</script>
+{% endblock %}

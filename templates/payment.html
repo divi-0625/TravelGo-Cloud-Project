@@ -1,0 +1,269 @@
+{% extends "base.html" %} {% block title %}Payment — TravelGo{% endblock %} {%
+block content %}
+<section class="section payment-section">
+  <div class="payment-wrapper">
+    <!-- Order Summary -->
+    <div class="card payment-summary-card">
+      <h3><span class="material-icons">receipt_long</span> Order Summary</h3>
+      <div class="summary-details">
+        <div class="summary-row">
+          <span>Service</span>
+          <span>{{ booking.item_name }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Type</span>
+          <span>{{ booking.item_type|title }}</span>
+        </div>
+        {% if booking.source %}
+        <div class="summary-row">
+          <span>Route</span>
+          <span>{{ booking.source }} &rarr; {{ booking.destination }}</span>
+        </div>
+        {% else %}
+        <div class="summary-row">
+          <span>Location</span>
+          <span>{{ booking.destination }}</span>
+        </div>
+        {% endif %}
+        <div class="summary-row">
+          <span>Date</span>
+          <span>{{ booking.date }}</span>
+        </div>
+        <div class="summary-row">
+          <span
+            >{{ 'Rooms' if booking.item_type == 'hotels' else 'Passengers'
+            }}</span
+          >
+          <span>{{ booking.passengers }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Price per unit</span>
+          <span>₹{{ "%.2f"|format(booking.price_per_unit) }}</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total Amount</span>
+          <span>₹{{ "%.2f"|format(booking.total_price) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="card payment-form-card">
+      <h3><span class="material-icons">payment</span> Payment Details</h3>
+
+      <form
+        method="POST"
+        action="{{ url_for('booking.payment') }}"
+        id="paymentForm"
+      >
+        <!-- Payment Method Tabs -->
+        <div class="payment-method-tabs">
+          <button type="button" class="pay-tab active" data-method="card">
+            <span class="material-icons">credit_card</span> Card
+          </button>
+          <button type="button" class="pay-tab" data-method="upi">
+            <span class="material-icons">account_balance_wallet</span> UPI
+          </button>
+          <button type="button" class="pay-tab" data-method="netbanking">
+            <span class="material-icons">account_balance</span> Net Banking
+          </button>
+        </div>
+
+        <input
+          type="hidden"
+          name="payment_method"
+          id="paymentMethod"
+          value="card"
+        />
+
+        <!-- Card Payment -->
+        <div class="pay-panel active" id="panel-card">
+          <div class="form-group">
+            <label for="card_name">Cardholder Name</label>
+            <input
+              type="text"
+              id="card_name"
+              name="card_name"
+              placeholder="Name on card"
+            />
+          </div>
+          <div class="form-group">
+            <label for="card_number">Card Number</label>
+            <input
+              type="text"
+              id="card_number"
+              name="card_number"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              autocomplete="cc-number"
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="card_expiry">Expiry (MM/YY)</label>
+              <input
+                type="text"
+                id="card_expiry"
+                name="card_expiry"
+                placeholder="MM/YY"
+                maxlength="5"
+              />
+            </div>
+            <div class="form-group">
+              <label for="card_cvv">CVV</label>
+              <input
+                type="password"
+                id="card_cvv"
+                name="card_cvv"
+                placeholder="•••"
+                maxlength="4"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- UPI Payment -->
+        <div class="pay-panel" id="panel-upi">
+          <div class="form-group">
+            <label for="upi_id">UPI ID</label>
+            <input
+              type="text"
+              id="upi_id"
+              name="upi_id"
+              placeholder="yourname@upi"
+            />
+          </div>
+          <div class="upi-apps">
+            <span class="upi-hint"
+              >Supports: Google Pay, PhonePe, Paytm, BHIM</span
+            >
+          </div>
+        </div>
+
+        <!-- Net Banking -->
+        <div class="pay-panel" id="panel-netbanking">
+          <div class="form-group">
+            <label for="bank_name">Select Bank</label>
+            <select id="bank_name" name="bank_name">
+              <option value="">-- Select Bank --</option>
+              <option value="SBI">State Bank of India</option>
+              <option value="HDFC">HDFC Bank</option>
+              <option value="ICICI">ICICI Bank</option>
+              <option value="Axis">Axis Bank</option>
+              <option value="Kotak">Kotak Mahindra Bank</option>
+              <option value="PNB">Punjab National Bank</option>
+              <option value="BOB">Bank of Baroda</option>
+              <option value="Yes">Yes Bank</option>
+              <option value="IndusInd">IndusInd Bank</option>
+              <option value="Union">Union Bank of India</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="payment-secure">
+          <span class="material-icons">lock</span>
+          <span>Your payment is secure and encrypted</span>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-block btn-lg"
+          id="payBtn"
+        >
+          <span class="material-icons">check_circle</span>
+          Pay ₹{{ "%.2f"|format(booking.total_price) }}
+        </button>
+
+        <a
+          href="{{ url_for('search.search_page') }}"
+          class="btn btn-outline btn-block"
+          style="margin-top: 0.5rem"
+        >
+          Cancel
+        </a>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script>
+  // Payment method tab switching
+  document.querySelectorAll(".pay-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document
+        .querySelectorAll(".pay-tab")
+        .forEach((t) => t.classList.remove("active"));
+      document
+        .querySelectorAll(".pay-panel")
+        .forEach((p) => p.classList.remove("active"));
+      tab.classList.add("active");
+      const method = tab.dataset.method;
+      document.getElementById("panel-" + method).classList.add("active");
+      document.getElementById("paymentMethod").value = method;
+    });
+  });
+
+  // Card number formatting (add spaces every 4 digits)
+  const cardInput = document.getElementById("card_number");
+  if (cardInput) {
+    cardInput.addEventListener("input", (e) => {
+      let v = e.target.value.replace(/\s/g, "").replace(/\D/g, "");
+      v = v.match(/.{1,4}/g)?.join(" ") || v;
+      e.target.value = v;
+    });
+  }
+
+  // Expiry formatting (auto-add slash)
+  const expiryInput = document.getElementById("card_expiry");
+  if (expiryInput) {
+    expiryInput.addEventListener("input", (e) => {
+      let v = e.target.value.replace(/\D/g, "");
+      if (v.length >= 2) v = v.substring(0, 2) + "/" + v.substring(2);
+      e.target.value = v;
+    });
+  }
+
+  // Simple form validation
+  document.getElementById("paymentForm").addEventListener("submit", (e) => {
+    const method = document.getElementById("paymentMethod").value;
+    if (method === "card") {
+      const num = document
+        .getElementById("card_number")
+        .value.replace(/\s/g, "");
+      const expiry = document.getElementById("card_expiry").value;
+      const cvv = document.getElementById("card_cvv").value;
+      const name = document.getElementById("card_name").value;
+      if (!num || !expiry || !cvv || !name) {
+        e.preventDefault();
+        alert("Please fill in all card details.");
+        return;
+      }
+      if (num.length < 13 || num.length > 19) {
+        e.preventDefault();
+        alert("Invalid card number.");
+        return;
+      }
+    } else if (method === "upi") {
+      const upi = document.getElementById("upi_id").value;
+      if (!upi || !upi.includes("@")) {
+        e.preventDefault();
+        alert("Please enter a valid UPI ID (e.g., name@upi).");
+        return;
+      }
+    } else if (method === "netbanking") {
+      const bank = document.getElementById("bank_name").value;
+      if (!bank) {
+        e.preventDefault();
+        alert("Please select a bank.");
+        return;
+      }
+    }
+
+    // Show processing state
+    const btn = document.getElementById("payBtn");
+    btn.disabled = true;
+    btn.innerHTML =
+      '<span class="material-icons spin">sync</span> Processing...';
+  });
+</script>
+{% endblock %}

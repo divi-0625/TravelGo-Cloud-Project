@@ -1,0 +1,585 @@
+{% extends "base.html" %} {% block title %}TravelGo — Explore the World{%
+endblock %} {% block content %}
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Explore the World with <span class="accent">TravelGo</span></h1>
+    <p class="hero-sub">
+      Search, compare &amp; book flights, hotels, trains and buses — all in one
+      place.
+    </p>
+    <a href="{{ url_for('search.search_page') }}" class="btn btn-primary btn-lg"
+      >Start Searching</a
+    >
+  </div>
+</section>
+
+<!-- ==================== QUICK SEARCH ==================== -->
+<section class="section quick-search" id="quickSearch">
+  <h2 class="section-title">Find Your Next Trip</h2>
+
+  <!-- Tabs -->
+  <div class="tabs" id="homeTabs">
+    <button class="tab active" data-tab="flights">
+      <span class="material-icons">flight</span> Flights
+    </button>
+    <button class="tab" data-tab="hotels">
+      <span class="material-icons">hotel</span> Hotels
+    </button>
+    <button class="tab" data-tab="trains">
+      <span class="material-icons">train</span> Trains
+    </button>
+    <button class="tab" data-tab="buses">
+      <span class="material-icons">directions_bus</span> Buses
+    </button>
+  </div>
+
+  <!-- Search forms (one per tab) -->
+  <div class="tab-panels">
+    <!-- Flights -->
+    <form
+      class="tab-panel active"
+      id="panel-flights"
+      action="{{ url_for('search.results') }}"
+      method="get"
+    >
+      <input type="hidden" name="type" value="flights" />
+      <div class="search-grid">
+        <div class="form-group autocomplete-wrapper">
+          <label>From</label>
+          <input
+            type="text"
+            name="source"
+            placeholder="City or airport"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="flights"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group autocomplete-wrapper">
+          <label>To</label>
+          <input
+            type="text"
+            name="destination"
+            placeholder="City or airport"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="flights"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" name="date" />
+        </div>
+        <div class="form-group btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span class="material-icons">search</span> Search Flights
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Hotels -->
+    <form
+      class="tab-panel"
+      id="panel-hotels"
+      action="{{ url_for('search.results') }}"
+      method="get"
+    >
+      <input type="hidden" name="type" value="hotels" />
+      <div class="search-grid">
+        <div class="form-group autocomplete-wrapper">
+          <label>Destination</label>
+          <input
+            type="text"
+            name="destination"
+            placeholder="City"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="hotels"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group">
+          <label>Check-in</label>
+          <input type="date" name="date" />
+        </div>
+        <div class="form-group btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span class="material-icons">search</span> Search Hotels
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Trains -->
+    <form
+      class="tab-panel"
+      id="panel-trains"
+      action="{{ url_for('search.results') }}"
+      method="get"
+    >
+      <input type="hidden" name="type" value="trains" />
+      <div class="search-grid">
+        <div class="form-group autocomplete-wrapper">
+          <label>From</label>
+          <input
+            type="text"
+            name="source"
+            placeholder="Station"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="trains"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group autocomplete-wrapper">
+          <label>To</label>
+          <input
+            type="text"
+            name="destination"
+            placeholder="Station"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="trains"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" name="date" />
+        </div>
+        <div class="form-group btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span class="material-icons">search</span> Search Trains
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Buses -->
+    <form
+      class="tab-panel"
+      id="panel-buses"
+      action="{{ url_for('search.results') }}"
+      method="get"
+    >
+      <input type="hidden" name="type" value="buses" />
+      <div class="search-grid">
+        <div class="form-group autocomplete-wrapper">
+          <label>From</label>
+          <input
+            type="text"
+            name="source"
+            placeholder="City"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="buses"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group autocomplete-wrapper">
+          <label>To</label>
+          <input
+            type="text"
+            name="destination"
+            placeholder="City"
+            required
+            autocomplete="off"
+            class="ac-input"
+            data-mode="buses"
+          />
+          <ul class="suggestions-dropdown ac-dropdown"></ul>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" name="date" />
+        </div>
+        <div class="form-group btn-group">
+          <button type="submit" class="btn btn-primary">
+            <span class="material-icons">search</span> Search Buses
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ==================== AVAILABLE LISTINGS ==================== -->
+<section class="section available-listings">
+  <h2 class="section-title">Available Options</h2>
+
+  <!-- Listing Tabs -->
+  <div class="tabs listing-tabs" id="listingTabs">
+    <button class="tab active" data-listing="flights">
+      <span class="material-icons">flight</span> Flights ({{
+      listings.flights|length }})
+    </button>
+    <button class="tab" data-listing="trains">
+      <span class="material-icons">train</span> Trains ({{
+      listings.trains|length }})
+    </button>
+    <button class="tab" data-listing="buses">
+      <span class="material-icons">directions_bus</span> Buses ({{
+      listings.buses|length }})
+    </button>
+    <button class="tab" data-listing="hotels">
+      <span class="material-icons">hotel</span> Hotels ({{
+      listings.hotels|length }})
+    </button>
+  </div>
+
+  <!-- Flights listing -->
+  <div class="listing-panel active" id="listing-flights">
+    <div class="card-grid listing-grid">
+      {% for item in listings.flights %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">flight</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='flights', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Trains listing -->
+  <div class="listing-panel" id="listing-trains">
+    <div class="card-grid listing-grid">
+      {% for item in listings.trains %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">train</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='trains', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Buses listing -->
+  <div class="listing-panel" id="listing-buses">
+    <div class="card-grid listing-grid">
+      {% for item in listings.buses %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">directions_bus</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p>
+            <strong>{{ item.source }}</strong> &rarr;
+            <strong>{{ item.destination }}</strong>
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >schedule</span
+            >
+            {{ item.departure }} — {{ item.arrival }} ({{ item.duration }})
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.date }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >airline_seat_recline_normal</span
+            >
+            {{ item.availability }} seats available
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='buses', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Hotels listing -->
+  <div class="listing-panel" id="listing-hotels">
+    <div class="card-grid listing-grid">
+      {% for item in listings.hotels %}
+      <div class="card result-card listing-card">
+        <div class="result-card-header">
+          <span class="material-icons result-type-icon">hotel</span>
+          <h3>{{ item.name }}</h3>
+        </div>
+        <div class="result-card-body">
+          <p><strong>{{ item.destination }}</strong></p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >event</span
+            >
+            {{ item.checkin }} &rarr; {{ item.checkout }}
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >star</span
+            >
+            {{ item.rating }} / 5
+          </p>
+          <p>
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >meeting_room</span
+            >
+            {{ item.availability }} rooms available
+          </p>
+          <p class="amenities-text">
+            <span
+              class="material-icons"
+              style="font-size: 0.9rem; vertical-align: middle"
+              >wifi</span
+            >
+            {{ item.amenities }}
+          </p>
+        </div>
+        <div class="result-card-footer">
+          <span class="price">&#8377;{{ "%.2f"|format(item.price) }}</span>
+          {% if session.get('user_id') %}
+          <a
+            href="{{ url_for('booking.book', item_type='hotels', item_id=item._id) }}"
+            class="btn btn-primary btn-sm"
+            >Book Now</a
+          >
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm"
+            >Login to Book</a
+          >
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FEATURES ==================== -->
+<section class="section features">
+  <h2 class="section-title">Why TravelGo?</h2>
+  <div class="card-grid features-grid">
+    <div class="card feature-card">
+      <span class="material-icons feature-icon">compare_arrows</span>
+      <h3>Compare Prices</h3>
+      <p>View prices across flights, trains, buses and hotels side by side.</p>
+    </div>
+    <div class="card feature-card">
+      <span class="material-icons feature-icon">bolt</span>
+      <h3>Instant Booking</h3>
+      <p>Book in seconds with real-time seat &amp; room availability.</p>
+    </div>
+    <div class="card feature-card">
+      <span class="material-icons feature-icon">notifications_active</span>
+      <h3>Smart Alerts</h3>
+      <p>Get price-drop alerts and travel reminders automatically.</p>
+    </div>
+    <div class="card feature-card">
+      <span class="material-icons feature-icon">security</span>
+      <h3>Secure</h3>
+      <p>Hashed passwords, session auth, and role-based access control.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== POPULAR DESTINATIONS ==================== -->
+<section class="section popular">
+  <h2 class="section-title">Popular Destinations</h2>
+  <div class="card-grid dest-grid">
+    <div
+      class="dest-card"
+      style="--bg: linear-gradient(135deg, #667eea, #764ba2)"
+    >
+      <span class="material-icons">location_city</span>
+      <h3>Mumbai</h3>
+      <p>Flights from ₹2,500</p>
+    </div>
+    <div
+      class="dest-card"
+      style="--bg: linear-gradient(135deg, #f093fb, #f5576c)"
+    >
+      <span class="material-icons">beach_access</span>
+      <h3>Goa</h3>
+      <p>Hotels from ₹1,500/night</p>
+    </div>
+    <div
+      class="dest-card"
+      style="--bg: linear-gradient(135deg, #4facfe, #00f2fe)"
+    >
+      <span class="material-icons">terrain</span>
+      <h3>Varanasi</h3>
+      <p>Trains from ₹250</p>
+    </div>
+    <div
+      class="dest-card"
+      style="--bg: linear-gradient(135deg, #43e97b, #38f9d7)"
+    >
+      <span class="material-icons">directions_bus</span>
+      <h3>Jaipur</h3>
+      <p>Buses from ₹300</p>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block scripts %}
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+<script>
+  // Home-page tab switching
+  document.querySelectorAll("#homeTabs .tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll("#homeTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".tab-panel")
+        .forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document
+        .getElementById("panel-" + btn.dataset.tab)
+        .classList.add("active");
+    });
+  });
+
+  // Init autocomplete on all ac-input fields
+  document.querySelectorAll(".ac-input").forEach((input) => {
+    const dropdown = input.parentElement.querySelector(".ac-dropdown");
+    if (dropdown) initAutocomplete(input, dropdown);
+  });
+
+  // Listing-tab switching
+  document.querySelectorAll("#listingTabs .tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document
+        .querySelectorAll("#listingTabs .tab")
+        .forEach((b) => b.classList.remove("active"));
+      document
+        .querySelectorAll(".listing-panel")
+        .forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document
+        .getElementById("listing-" + btn.dataset.listing)
+        .classList.add("active");
+    });
+  });
+</script>
+{% endblock %}

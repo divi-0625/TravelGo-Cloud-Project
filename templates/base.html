@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}TravelGo{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+    <!-- Google Material Icons (CDN – free, no React) -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar" id="navbar">
+      <div class="nav-container">
+        <a href="{{ url_for('main.home') }}" class="nav-logo">
+          <span class="material-icons">flight_takeoff</span>
+          TravelGo
+        </a>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+          <span class="material-icons">menu</span>
+        </button>
+
+        <ul class="nav-links" id="navLinks">
+          <li><a href="{{ url_for('main.home') }}">Home</a></li>
+          <li><a href="{{ url_for('search.search_page') }}">Search</a></li>
+          {% if session.get('user_id') %}
+          <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+          <li><a href="{{ url_for('main.profile') }}">Profile</a></li>
+          {% if session.get('role') == 'admin' %}
+          <li>
+            <a href="{{ url_for('admin.dashboard') }}" class="admin-link"
+              >Admin</a
+            >
+          </li>
+          {% endif %}
+          <li class="notif-badge-wrapper">
+            <a href="{{ url_for('main.dashboard') }}">
+              <span class="material-icons">notifications</span>
+              {% if unread_count %}
+              <span class="notif-badge">{{ unread_count }}</span>
+              {% endif %}
+            </a>
+          </li>
+          <li>
+            <a href="{{ url_for('auth.logout') }}" class="btn-nav btn-logout"
+              >Logout</a
+            >
+          </li>
+          {% else %}
+          <li>
+            <a href="{{ url_for('auth.login') }}" class="btn-nav">Login</a>
+          </li>
+          <li>
+            <a
+              href="{{ url_for('auth.register') }}"
+              class="btn-nav btn-primary-nav"
+              >Register</a
+            >
+          </li>
+          {% endif %}
+          <li>
+            <label
+              class="theme-switch"
+              id="themeToggle"
+              title="Toggle dark mode"
+            >
+              <input type="checkbox" id="themeCheckbox" />
+              <span class="switch-track">
+                <span class="switch-icon sun material-icons">light_mode</span>
+                <span class="switch-thumb"></span>
+                <span class="switch-icon moon material-icons">dark_mode</span>
+              </span>
+            </label>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ==================== FLASH MESSAGES ==================== -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-container">
+      {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">
+        <span>{{ message }}</span>
+        <button class="flash-close" onclick="this.parentElement.remove()">
+          &times;
+        </button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+
+    <!-- ==================== CONTENT ==================== -->
+    <main class="main-content">{% block content %}{% endblock %}</main>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-col">
+          <h4><span class="material-icons">flight_takeoff</span> TravelGo</h4>
+          <p>Your one-stop platform for flights, hotels, trains &amp; buses.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{{ url_for('main.home') }}">Home</a></li>
+            <li><a href="{{ url_for('search.search_page') }}">Search</a></li>
+            {% if session.get('user_id') %}
+            <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Travel Types</h4>
+          <ul>
+            <li>
+              <a href="{{ url_for('search.search_page', tab='flights') }}"
+                >Flights</a
+              >
+            </li>
+            <li>
+              <a href="{{ url_for('search.search_page', tab='hotels') }}"
+                >Hotels</a
+              >
+            </li>
+            <li>
+              <a href="{{ url_for('search.search_page', tab='trains') }}"
+                >Trains</a
+              >
+            </li>
+            <li>
+              <a href="{{ url_for('search.search_page', tab='buses') }}"
+                >Buses</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <p>support@travelgo.com</p>
+          <p>&copy; 2026 TravelGo. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ==================== JS ==================== -->
+    <script>
+      // --- Mobile nav toggle ---
+      document.getElementById("navToggle").addEventListener("click", () => {
+        document.getElementById("navLinks").classList.toggle("active");
+      });
+
+      // --- Dark mode toggle ---
+      const html = document.documentElement;
+      const themeCheckbox = document.getElementById("themeCheckbox");
+
+      function setTheme(dark) {
+        html.setAttribute("data-theme", dark ? "dark" : "light");
+        themeCheckbox.checked = dark;
+        localStorage.setItem("theme", dark ? "dark" : "light");
+      }
+
+      // Restore saved theme
+      if (localStorage.getItem("theme") === "dark") setTheme(true);
+
+      themeCheckbox.addEventListener("change", () => {
+        setTheme(themeCheckbox.checked);
+      });
+
+      // Auto-dismiss flash after 5 s
+      setTimeout(() => {
+        document.querySelectorAll(".flash").forEach((el) => el.remove());
+      }, 5000);
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
