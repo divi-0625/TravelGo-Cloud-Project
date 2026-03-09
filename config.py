@@ -1,5 +1,5 @@
 class Config:
-    SECRET_KEY = "travelgo-dev-secret-key-change-in-prod"
+    SECRET_KEY = "teamnameuniquetechwithteamleaderandteammembers"
     AWS_REGION = "ap-south-1"
     SNS_TOPIC_ARN = "arn:aws:sns:ap-south-1:336449003024:TravelGoNotifications"
     DYNAMO_TABLE_PREFIX = "travelgo"

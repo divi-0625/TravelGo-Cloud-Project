@@ -11,7 +11,10 @@ from routes import register_blueprints
 
 def create_app(config_name=None):
     if config_name is None:
-        config_name = os.environ.get("FLASK_ENV", "development")
+        config_name = os.environ.get("FLASK_ENV", "production")
+
+    if config_name not in config_by_name:
+        config_name = "production"
 
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
@@ -49,6 +52,8 @@ def create_app(config_name=None):
     return app
 
 
+app = create_app()
+
+
 if __name__ == "__main__":
-    application = create_app()
-    application.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=False)
